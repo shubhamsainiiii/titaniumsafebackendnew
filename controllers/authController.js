@@ -10,6 +10,8 @@ const jwt = require("jsonwebtoken");
 // =============================
 exports.registerAdmin = async (req, res) => {
 
+    console.log("REGISTER API HIT");
+
     try {
 
         const {
@@ -62,7 +64,7 @@ exports.registerAdmin = async (req, res) => {
 // Login Admin
 // =============================
 exports.loginAdmin = async (req, res) => {
-
+    console.log("LOGIN API HIT");
     try {
 
         const {
