@@ -84,7 +84,8 @@ exports.createProduct = async (req, res) => {
                             withoutEnlargement: true,
                         })
                         .webp({
-                            quality: 75,
+                            quality: 60,
+                            effort: 6,
                         })
                         .toBuffer();
 
@@ -277,7 +278,8 @@ exports.updateProduct = async (req, res) => {
                             withoutEnlargement: true,
                         })
                         .webp({
-                            quality: 75,
+                            quality: 60,
+                            effort: 6,
                         })
                         .toBuffer();
 
