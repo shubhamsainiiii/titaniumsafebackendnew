@@ -1,40 +1,36 @@
 const Product = require("../models/Product");
-
 const cloudinary = require("../config/cloudinary");
-
 const streamifier = require("streamifier");
-
+const Review = require("../models/Review");
+const sharp = require("sharp");
 
 // ===============================
 // Upload Image To Cloudinary
 // ===============================
-const uploadToCloudinary = (fileBuffer) => {
-
-    return new Promise((resolve, reject) => {
-
-        const stream =
-            cloudinary.uploader.upload_stream(
-
-                {
-                    folder: "titaniumsafe",
-                },
-
-                (error, result) => {
-
-                    if (result) {
-                        resolve(result);
-                    } else {
-                        reject(error);
+const uploadToCloudinary = (
+    fileBuffer
+) => {
+    return new Promise(
+        (resolve, reject) => {
+            const stream =
+                cloudinary.uploader.upload_stream(
+                    {
+                        folder: "titaniumsafe",
+                        format: "webp",
+                    },
+                    (error, result) => {
+                        if (result) {
+                            resolve(result);
+                        } else {
+                            reject(error);
+                        }
                     }
-
-                }
-            );
-
-        streamifier
-            .createReadStream(fileBuffer)
-            .pipe(stream);
-
-    });
+                );
+            streamifier
+                .createReadStream(fileBuffer)
+                .pipe(stream);
+        }
+    );
 };
 
 
@@ -73,34 +69,37 @@ exports.createProduct = async (req, res) => {
             !price ||
             !category
         ) {
-
             return res.status(400).json({
                 success: false,
                 message: "All Fields Are Required",
             });
-
         }
-
-        // Upload Images
         let imageUrls = [];
-
         if (req.files && req.files.length > 0) {
-
             for (let file of req.files) {
+                const compressedBuffer =
+                    await sharp(file.buffer)
+                        .resize({
+                            width: 1200,
+                            withoutEnlargement: true,
+                        })
+                        .webp({
+                            quality: 75,
+                        })
+                        .toBuffer();
 
                 const uploadedImage =
-                    await uploadToCloudinary(file.buffer);
+                    await uploadToCloudinary(
+                        compressedBuffer
+                    );
 
                 imageUrls.push(
                     uploadedImage.secure_url
                 );
             }
         }
-
-        // Create Product
         const product =
             await Product.create({
-
                 name,
                 brandName,
                 colour,
@@ -132,10 +131,6 @@ exports.createProduct = async (req, res) => {
     }
 };
 
-
-// ===============================
-// Get All Products
-// ===============================
 exports.getProducts = async (req, res) => {
 
     try {
@@ -144,9 +139,41 @@ exports.getProducts = async (req, res) => {
             await Product.find()
                 .sort({ createdAt: -1 });
 
+        const productsWithRating =
+            await Promise.all(
+
+                products.map(async (product) => {
+
+                    const reviews =
+                        await Review.find({
+                            productId: product._id,
+                        });
+
+                    const totalReviews =
+                        reviews.length;
+
+                    const averageRating =
+                        totalReviews > 0
+                            ? (
+                                reviews.reduce(
+                                    (sum, item) =>
+                                        sum + item.rating,
+                                    0
+                                ) / totalReviews
+                            ).toFixed(1)
+                            : 0;
+
+                    return {
+                        ...product.toObject(),
+                        averageRating,
+                        totalReviews,
+                    };
+                })
+            );
+
         res.status(200).json({
             success: true,
-            products,
+            products: productsWithRating,
         });
 
     } catch (error) {
@@ -243,8 +270,21 @@ exports.updateProduct = async (req, res) => {
 
             for (let file of req.files) {
 
+                const compressedBuffer =
+                    await sharp(file.buffer)
+                        .resize({
+                            width: 1200,
+                            withoutEnlargement: true,
+                        })
+                        .webp({
+                            quality: 75,
+                        })
+                        .toBuffer();
+
                 const uploadedImage =
-                    await uploadToCloudinary(file.buffer);
+                    await uploadToCloudinary(
+                        compressedBuffer
+                    );
 
                 imageUrls.push(
                     uploadedImage.secure_url

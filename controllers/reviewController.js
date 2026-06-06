@@ -152,3 +152,40 @@ exports.deleteReview = async (req, res) => {
 
     }
 };
+
+
+// ===============================
+// Get All Reviews For Admin
+// ===============================
+exports.getAllReviews = async (req, res) => {
+    try {
+
+        const reviews = await Review.find()
+            .populate("productId", "name")
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            reviews,
+            totalReviews: reviews.length,
+            averageRating:
+                reviews.length > 0
+                    ? (
+                        reviews.reduce(
+                            (sum, review) =>
+                                sum + review.rating,
+                            0
+                        ) / reviews.length
+                    ).toFixed(1)
+                    : 0,
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+
+    }
+};

@@ -11,6 +11,7 @@ const {
     getProductReviews,
     getLatestReviews,
     deleteReview,
+    getAllReviews
 } = require("../controllers/reviewController");
 
 
@@ -44,6 +45,12 @@ router.get(
     "/latest",
 
     getLatestReviews
+);
+
+router.get(
+    "/all",
+    isAdmin,
+    getAllReviews
 );
 
 
