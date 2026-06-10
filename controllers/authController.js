@@ -128,7 +128,7 @@ exports.loginAdmin = async (req, res) => {
         });
 
     } catch (error) {
-
+        console.log("Login Error:", error);
         res.status(500).json({
             success: false,
             message: error.message,
