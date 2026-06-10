@@ -3,7 +3,7 @@ const Admin = require("../models/Admin");
 const bcrypt = require("bcryptjs");
 
 const jwt = require("jsonwebtoken");
-
+const connectDB = require("../config/connectDB");
 
 // =============================
 // Register Admin
@@ -11,8 +11,8 @@ const jwt = require("jsonwebtoken");
 exports.registerAdmin = async (req, res) => {
 
     console.log("REGISTER API HIT");
-
     try {
+        await connectDB();
 
         const {
             email,
@@ -66,6 +66,7 @@ exports.registerAdmin = async (req, res) => {
 exports.loginAdmin = async (req, res) => {
     console.log("LOGIN API HIT");
     try {
+        await connectDB();
 
         const {
             email,

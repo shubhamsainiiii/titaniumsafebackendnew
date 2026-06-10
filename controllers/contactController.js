@@ -1,5 +1,5 @@
 const Contact = require("../models/Contact");
-
+const connectDB = require("../config/connectDB");
 
 // ===============================
 // Create Contact / Inquiry
@@ -8,6 +8,7 @@ exports.createContact = async (req, res) => {
 
     try {
 
+        await connectDB();
         const {
             name,
             email,
@@ -62,8 +63,8 @@ exports.createContact = async (req, res) => {
 // Get All Contacts
 // ===============================
 exports.getContacts = async (req, res) => {
-
     try {
+        await connectDB();
 
         const contacts =
             await Contact.find()
@@ -89,8 +90,8 @@ exports.getContacts = async (req, res) => {
 // Delete Contact
 // ===============================
 exports.deleteContact = async (req, res) => {
-
     try {
+        await connectDB();
 
         const contact =
             await Contact.findById(

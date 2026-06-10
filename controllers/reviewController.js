@@ -1,7 +1,7 @@
 const Review = require("../models/Review");
 
 const Product = require("../models/Product");
-
+const connectDB = require("../config/connectDB");
 
 // ===============================
 // Create Review
@@ -9,7 +9,7 @@ const Product = require("../models/Product");
 exports.createReview = async (req, res) => {
 
     try {
-
+        await connectDB();
         const {
             productId,
             userName,
@@ -69,6 +69,7 @@ exports.createReview = async (req, res) => {
 };
 exports.getProductReviews = async (req, res) => {
     try {
+        await connectDB();
         const reviews =
             await Review.find({
                 productId: req.params.productId,
@@ -90,8 +91,8 @@ exports.getProductReviews = async (req, res) => {
 // Get Latest Reviews
 // ===============================
 exports.getLatestReviews = async (req, res) => {
-
     try {
+        await connectDB();
 
         const reviews =
             await Review.find()
@@ -118,8 +119,8 @@ exports.getLatestReviews = async (req, res) => {
 // Delete Review
 // ===============================
 exports.deleteReview = async (req, res) => {
-
     try {
+        await connectDB();
 
         const review =
             await Review.findById(
@@ -159,6 +160,7 @@ exports.deleteReview = async (req, res) => {
 // ===============================
 exports.getAllReviews = async (req, res) => {
     try {
+        await connectDB();
 
         const reviews = await Review.find()
             .populate("productId", "name")

@@ -3,6 +3,8 @@ const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
 const Review = require("../models/Review");
 const sharp = require("sharp");
+const connectDB = require("../config/connectDB");
+
 
 // ===============================
 // Upload Image To Cloudinary
@@ -40,7 +42,7 @@ const uploadToCloudinary = (
 exports.createProduct = async (req, res) => {
 
     try {
-
+        await connectDB();
         const {
             name,
             brandName,
@@ -133,8 +135,8 @@ exports.createProduct = async (req, res) => {
 };
 
 exports.getProducts = async (req, res) => {
-
     try {
+        await connectDB();
 
         const products =
             await Product.find()
@@ -192,8 +194,8 @@ exports.getProducts = async (req, res) => {
 // Get Single Product
 // ===============================
 exports.getSingleProduct = async (req, res) => {
-
     try {
+        await connectDB();
 
         const product =
             await Product.findById(
@@ -229,8 +231,8 @@ exports.getSingleProduct = async (req, res) => {
 // Update Product
 // ===============================
 exports.updateProduct = async (req, res) => {
-
     try {
+        await connectDB();
 
         const {
             name,
@@ -343,8 +345,8 @@ exports.updateProduct = async (req, res) => {
 // Delete Product
 // ===============================
 exports.deleteProduct = async (req, res) => {
-
     try {
+        await connectDB();
 
         const product =
             await Product.findById(
@@ -388,6 +390,7 @@ exports.deleteProduct = async (req, res) => {
 
 exports.toggleAvailability = async (req, res) => {
     try {
+        await connectDB();
         const product =
             await Product.findById(
                 req.params.id
