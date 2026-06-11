@@ -1,14 +1,151 @@
+// const Contact = require("../models/Contact");
+// const connectDB = require("../config/connectDB");
+
+// // ===============================
+// // Create Contact / Inquiry
+// // ===============================
+// exports.createContact = async (req, res) => {
+
+//     try {
+
+//         await connectDB();
+//         const {
+//             name,
+//             email,
+//             phone,
+//             message,
+//         } = req.body;
+
+//         // Validation
+//         if (
+//             !name ||
+//             !email ||
+//             !phone ||
+//             !message
+//         ) {
+
+//             return res.status(400).json({
+//                 success: false,
+//                 message: "All Fields Are Required",
+//             });
+
+//         }
+
+//         // Save Contact
+//         const contact =
+//             await Contact.create({
+
+//                 name,
+//                 email,
+//                 phone,
+//                 message,
+//             });
+
+//         res.status(201).json({
+//             success: true,
+//             message:
+//                 "Inquiry Submitted Successfully",
+//             contact,
+//         });
+
+//     } catch (error) {
+
+//         res.status(500).json({
+//             success: false,
+//             message: error.message,
+//         });
+
+//     }
+// };
+
+
+// // ===============================
+// // Get All Contacts
+// // ===============================
+// exports.getContacts = async (req, res) => {
+//     try {
+//         await connectDB();
+
+//         const contacts =
+//             await Contact.find()
+//                 .sort({ createdAt: -1 });
+
+//         res.status(200).json({
+//             success: true,
+//             contacts,
+//         });
+
+//     } catch (error) {
+
+//         res.status(500).json({
+//             success: false,
+//             message: error.message,
+//         });
+
+//     }
+// };
+
+
+// // ===============================
+// // Delete Contact
+// // ===============================
+// exports.deleteContact = async (req, res) => {
+//     try {
+//         await connectDB();
+
+//         const contact =
+//             await Contact.findById(
+//                 req.params.id
+//             );
+
+//         if (!contact) {
+
+//             return res.status(404).json({
+//                 success: false,
+//                 message: "Contact Not Found",
+//             });
+
+//         }
+
+//         await contact.deleteOne();
+
+//         res.status(200).json({
+//             success: true,
+//             message:
+//                 "Contact Deleted Successfully",
+//         });
+
+//     } catch (error) {
+
+//         res.status(500).json({
+//             success: false,
+//             message: error.message,
+//         });
+
+//     }
+// };
+
+
 const Contact = require("../models/Contact");
 const connectDB = require("../config/connectDB");
+const sendEmail = require("../utils/sendEmail");
+
+const contactAdminTemplate = require(
+    "../templates/contactAdminTemplate"
+);
+
+const contactUserTemplate = require(
+    "../templates/contactUserTemplate"
+);
 
 // ===============================
 // Create Contact / Inquiry
 // ===============================
 exports.createContact = async (req, res) => {
-
     try {
 
         await connectDB();
+
         const {
             name,
             email,
@@ -16,30 +153,45 @@ exports.createContact = async (req, res) => {
             message,
         } = req.body;
 
-        // Validation
         if (
             !name ||
             !email ||
             !phone ||
             !message
         ) {
-
             return res.status(400).json({
                 success: false,
                 message: "All Fields Are Required",
             });
-
         }
 
-        // Save Contact
         const contact =
             await Contact.create({
-
                 name,
                 email,
                 phone,
                 message,
             });
+
+        // Send Email To Admin
+        await sendEmail({
+            to: process.env.EMAIL_USER,
+            replyTo: email,
+            subject: "New Contact Form Submission",
+            html: contactAdminTemplate({
+                name,
+                email,
+                phone,
+                message,
+            }),
+        });
+
+        // Send Auto Reply To User
+        await sendEmail({
+            to: email,
+            subject: "Thank You For Contacting Titanium Safe",
+            html: contactUserTemplate(name),
+        });
 
         res.status(201).json({
             success: true,
@@ -50,6 +202,8 @@ exports.createContact = async (req, res) => {
 
     } catch (error) {
 
+        console.log(error);
+
         res.status(500).json({
             success: false,
             message: error.message,
@@ -57,7 +211,6 @@ exports.createContact = async (req, res) => {
 
     }
 };
-
 
 // ===============================
 // Get All Contacts
