@@ -2,8 +2,253 @@ const Product = require("../models/Product");
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
 const Review = require("../models/Review");
-const sharp = require("sharp");
+// const sharp = require("sharp");
 const connectDB = require("../config/connectDB");
+
+
+
+// ===============================
+// Upload Image To Cloudinary
+// ===============================
+// const uploadToCloudinary = (
+//     fileBuffer
+// ) => {
+//     return new Promise(
+//         (resolve, reject) => {
+//             const stream =
+//                 cloudinary.uploader.upload_stream(
+//                     {
+//                         folder: "titaniumsafe",
+//                         format: "webp",
+//                     },
+//                     (error, result) => {
+//                         if (result) {
+//                             resolve(result);
+//                         } else {
+//                             reject(error);
+//                         }
+//                     }
+//                 );
+//             streamifier
+//                 .createReadStream(fileBuffer)
+//                 .pipe(stream);
+//         }
+//     );
+// };
+
+
+// ===============================
+// Create Product
+// ===============================
+// exports.createProduct = async (req, res) => {
+
+//     try {
+//         await connectDB();
+//         const {
+//             name,
+//             brandName,
+//             colour,
+//             material,
+//             specialFeature,
+//             productDimensions,
+//             closureType,
+//             waterResistanceLevel,
+//             description,
+//             price,
+//             category,
+//         } = req.body;
+
+//         // Validation
+//         if (
+//             !name ||
+//             !brandName ||
+//             !colour ||
+//             !material ||
+//             !specialFeature ||
+//             !productDimensions ||
+//             !closureType ||
+//             !waterResistanceLevel ||
+//             !description ||
+//             !price ||
+//             !category
+//         ) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: "All Fields Are Required",
+//             });
+//         }
+//         let imageUrls = [];
+//         if (req.files && req.files.length > 0) {
+//             for (let file of req.files) {
+//                 const compressedBuffer =
+//                     await sharp(file.buffer)
+//                         .resize({
+//                             width: 1200,
+//                             withoutEnlargement: true,
+//                         })
+//                         .webp({
+//                             quality: 60,
+//                             effort: 6,
+//                         })
+//                         .toBuffer();
+
+//                 const uploadedImage =
+//                     await uploadToCloudinary(
+//                         compressedBuffer
+//                     );
+
+//                 imageUrls.push(
+//                     uploadedImage.secure_url
+//                 );
+//             }
+//         }
+//         const product =
+//             await Product.create({
+//                 name,
+//                 brandName,
+//                 colour,
+//                 material,
+//                 specialFeature,
+//                 productDimensions,
+//                 closureType,
+//                 waterResistanceLevel,
+//                 description,
+//                 price,
+//                 category,
+
+//                 images: imageUrls,
+//             });
+
+//         res.status(201).json({
+//             success: true,
+//             message: "Product Created Successfully",
+//             product,
+//         });
+
+//     } catch (error) {
+
+//         res.status(500).json({
+//             success: false,
+//             message: error.message,
+//         });
+
+//     }
+// };
+
+// ===============================
+// Update Product
+// ===============================
+// exports.updateProduct = async (req, res) => {
+//     try {
+//         await connectDB();
+
+//         const {
+//             name,
+//             brandName,
+//             colour,
+//             material,
+//             specialFeature,
+//             productDimensions,
+//             closureType,
+//             waterResistanceLevel,
+//             description,
+//             price,
+//             category,
+//             available,
+//         } = req.body;
+
+//         // Find Product
+//         let product =
+//             await Product.findById(
+//                 req.params.id
+//             );
+
+//         if (!product) {
+
+//             return res.status(404).json({
+//                 success: false,
+//                 message: "Product Not Found",
+//             });
+
+//         }
+
+//         // Upload New Images
+//         let imageUrls = product.images;
+
+//         if (req.files && req.files.length > 0) {
+
+//             imageUrls = [];
+
+//             for (let file of req.files) {
+
+//                 const compressedBuffer =
+//                     await sharp(file.buffer)
+//                         .resize({
+//                             width: 1200,
+//                             withoutEnlargement: true,
+//                         })
+//                         .webp({
+//                             quality: 60,
+//                             effort: 6,
+//                         })
+//                         .toBuffer();
+
+//                 const uploadedImage =
+//                     await uploadToCloudinary(
+//                         compressedBuffer
+//                     );
+
+//                 imageUrls.push(
+//                     uploadedImage.secure_url
+//                 );
+//             }
+//         }
+
+//         // Update Product
+//         product =
+//             await Product.findByIdAndUpdate(
+
+//                 req.params.id,
+
+//                 {
+//                     name,
+//                     brandName,
+//                     colour,
+//                     material,
+//                     specialFeature,
+//                     productDimensions,
+//                     closureType,
+//                     waterResistanceLevel,
+//                     description,
+//                     price,
+//                     category,
+//                     available,
+
+//                     images: imageUrls,
+//                 },
+
+//                 {
+//                     new: true,
+//                 }
+//             );
+
+//         res.status(200).json({
+//             success: true,
+//             message: "Product Updated Successfully",
+//             product,
+//         });
+
+//     } catch (error) {
+
+//         res.status(500).json({
+//             success: false,
+//             message: error.message,
+//         });
+
+//     }
+// };
+
+
 
 
 // ===============================
@@ -79,21 +324,9 @@ exports.createProduct = async (req, res) => {
         let imageUrls = [];
         if (req.files && req.files.length > 0) {
             for (let file of req.files) {
-                const compressedBuffer =
-                    await sharp(file.buffer)
-                        .resize({
-                            width: 1200,
-                            withoutEnlargement: true,
-                        })
-                        .webp({
-                            quality: 60,
-                            effort: 6,
-                        })
-                        .toBuffer();
-
                 const uploadedImage =
                     await uploadToCloudinary(
-                        compressedBuffer
+                        file.buffer
                     );
 
                 imageUrls.push(
@@ -133,6 +366,110 @@ exports.createProduct = async (req, res) => {
 
     }
 };
+
+// ===============================
+// Update Product
+// ===============================
+exports.updateProduct = async (req, res) => {
+    try {
+        await connectDB();
+
+        const {
+            name,
+            brandName,
+            colour,
+            material,
+            specialFeature,
+            productDimensions,
+            closureType,
+            waterResistanceLevel,
+            description,
+            price,
+            category,
+            available,
+        } = req.body;
+
+        // Find Product
+        let product =
+            await Product.findById(
+                req.params.id
+            );
+
+        if (!product) {
+
+            return res.status(404).json({
+                success: false,
+                message: "Product Not Found",
+            });
+
+        }
+
+        // Upload New Images
+        let imageUrls = product.images;
+
+        if (req.files && req.files.length > 0) {
+
+            imageUrls = [];
+
+            for (let file of req.files) {
+
+                const uploadedImage =
+                    await uploadToCloudinary(
+                        file.buffer
+                    );
+
+                imageUrls.push(
+                    uploadedImage.secure_url
+                );
+            }
+        }
+
+        // Update Product
+        product =
+            await Product.findByIdAndUpdate(
+
+                req.params.id,
+
+                {
+                    name,
+                    brandName,
+                    colour,
+                    material,
+                    specialFeature,
+                    productDimensions,
+                    closureType,
+                    waterResistanceLevel,
+                    description,
+                    price,
+                    category,
+                    available,
+
+                    images: imageUrls,
+                },
+
+                {
+                    new: true,
+                }
+            );
+
+        res.status(200).json({
+            success: true,
+            message: "Product Updated Successfully",
+            product,
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+
+    }
+};
+
+
+
 
 exports.getProducts = async (req, res) => {
     try {
@@ -227,118 +564,7 @@ exports.getSingleProduct = async (req, res) => {
 };
 
 
-// ===============================
-// Update Product
-// ===============================
-exports.updateProduct = async (req, res) => {
-    try {
-        await connectDB();
 
-        const {
-            name,
-            brandName,
-            colour,
-            material,
-            specialFeature,
-            productDimensions,
-            closureType,
-            waterResistanceLevel,
-            description,
-            price,
-            category,
-            available,
-        } = req.body;
-
-        // Find Product
-        let product =
-            await Product.findById(
-                req.params.id
-            );
-
-        if (!product) {
-
-            return res.status(404).json({
-                success: false,
-                message: "Product Not Found",
-            });
-
-        }
-
-        // Upload New Images
-        let imageUrls = product.images;
-
-        if (req.files && req.files.length > 0) {
-
-            imageUrls = [];
-
-            for (let file of req.files) {
-
-                const compressedBuffer =
-                    await sharp(file.buffer)
-                        .resize({
-                            width: 1200,
-                            withoutEnlargement: true,
-                        })
-                        .webp({
-                            quality: 60,
-                            effort: 6,
-                        })
-                        .toBuffer();
-
-                const uploadedImage =
-                    await uploadToCloudinary(
-                        compressedBuffer
-                    );
-
-                imageUrls.push(
-                    uploadedImage.secure_url
-                );
-            }
-        }
-
-        // Update Product
-        product =
-            await Product.findByIdAndUpdate(
-
-                req.params.id,
-
-                {
-                    name,
-                    brandName,
-                    colour,
-                    material,
-                    specialFeature,
-                    productDimensions,
-                    closureType,
-                    waterResistanceLevel,
-                    description,
-                    price,
-                    category,
-                    available,
-
-                    images: imageUrls,
-                },
-
-                {
-                    new: true,
-                }
-            );
-
-        res.status(200).json({
-            success: true,
-            message: "Product Updated Successfully",
-            product,
-        });
-
-    } catch (error) {
-
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
-
-    }
-};
 
 
 // ===============================
