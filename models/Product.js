@@ -85,6 +85,17 @@ const productSchema = new mongoose.Schema(
             type: Boolean,
             default: true,
         },
+        amazonLink: {
+            type: String,
+            default: "",
+            trim: true,
+        },
+
+        flipkartLink: {
+            type: String,
+            default: "",
+            trim: true,
+        },
     },
     {
         timestamps: true,
