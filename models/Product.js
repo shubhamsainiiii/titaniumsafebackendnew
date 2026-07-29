@@ -13,7 +13,11 @@ const productSchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
-
+        weight: {
+            type: String,
+            required: true,
+            trim: true,
+        },
         colour: {
             type: String,
             required: true,

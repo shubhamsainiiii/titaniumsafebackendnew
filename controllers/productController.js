@@ -53,6 +53,7 @@ exports.createProduct = async (req, res) => {
             waterResistanceLevel,
             description,
             price,
+            weight,
             category,
             amazonLink,
             flipkartLink,
@@ -70,6 +71,7 @@ exports.createProduct = async (req, res) => {
             !waterResistanceLevel ||
             !description ||
             !price ||
+            !weight ||
             !amazonLink ||
             !flipkartLink ||
             !category
@@ -104,6 +106,7 @@ exports.createProduct = async (req, res) => {
                 waterResistanceLevel,
                 description,
                 price,
+                weight,
                 category,
                 amazonLink,
                 flipkartLink,
@@ -144,6 +147,7 @@ exports.updateProduct = async (req, res) => {
             waterResistanceLevel,
             description,
             price,
+            weight,
             category,
             amazonLink,
             flipkartLink,
@@ -202,6 +206,7 @@ exports.updateProduct = async (req, res) => {
                     waterResistanceLevel,
                     description,
                     price,
+                    weight,
                     category,
                     available,
                     amazonLink,
